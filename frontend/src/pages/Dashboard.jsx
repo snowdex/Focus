@@ -1,9 +1,14 @@
 import React from 'react'
 import { Link } from 'react-router-dom';
 import Tile from '../components/Tile';
+import AddTask from '../components/AddTask';
 import TaskTile from '../components/TaskTile';
 
 export default function Dashboard() {
+
+  
+
+
   
   return (
     <div className="min-h-screen flex bg-gray-950 text-gray-100">
@@ -57,7 +62,10 @@ export default function Dashboard() {
         </div>
 
         {/* Task Feed */}
+        <div className='p-4 roboto-slab bg-gray-900 flex flex-col rounded-lg gap-3'>
+          <h1>Task Feed</h1>
         <TaskTile />
+        </div>
       </main>
 
       {/* Right Sidebar */}
@@ -80,6 +88,7 @@ export default function Dashboard() {
             Start
           </button>
         </div>
+      <AddTask  />
       </aside>
     </div>
   );
