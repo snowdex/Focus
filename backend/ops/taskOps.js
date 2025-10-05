@@ -20,4 +20,25 @@ const getTasks = async(req, res)=>{
     res.status(200).json({tasks});
 }
 
-module.exports = {createTask, getTasks};
+const updateTask = async(req, res)=>{
+    const {id} = req.params;
+    const {title, description, status, dueDate} = req.body;
+    const task = await Task.findById(id);
+    if(!task){
+        return res.status(404).json({message: "Task not found"});
+    }
+    
+    const updatedTask = await Task.findByIdAndUpdate(id, {
+        title: title || task.title,
+        description: description || task.description,
+        status: status || task.status,
+        dueDate: dueDate || task.dueDate
+    }, {new: true});
+    res.status(200).json({message: "Task Updated Successfully", task: updatedTask});
+}
+
+
+
+
+
+module.exports = {createTask, getTasks, updateTask};

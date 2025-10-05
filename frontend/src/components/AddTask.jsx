@@ -1,14 +1,9 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import axios from "axios";
-import { useSelector } from "react-redux";
 
-export default function AddTask() {
+export default function AddTask({onSubmit, }) {
 
-  const token = useSelector((state)=> state.auth.token);
-
-
-
+//Form variables
   const {
     register,
     handleSubmit,
@@ -16,13 +11,9 @@ export default function AddTask() {
     reset,
   } = useForm();
 
+  //handlers
   const submitHandler = async(data) => {
-    const res = await axios.post("http://localhost:3000/api/v1/dashboard/task/new",data, {
-      headers: {
-              Authorization: `Bearer ${token}`,
-            },
-    });
-    console.log(res.data)
+    await onSubmit(data)
     reset(); // clear form after submit
   };
 

@@ -1,27 +1,67 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { MdMenu } from "react-icons/md";
+import { IoMdClose } from "react-icons/io";
 import { Link } from 'react-router-dom';
-import Tile from '../components/Tile';
+import axios from 'axios';
 import AddTask from '../components/AddTask';
 import TaskTile from '../components/TaskTile';
+import { useSelector } from 'react-redux';
+import SideBar from '../components/SideBar';
 
 export default function Dashboard() {
+  const [todos, setTodos] = useState([]);
+  const token = useSelector((state) => state.auth.token);
+  const [sideEx, setSideEx] = useState(false);
 
+  const checkEx = ()=>{
+    setSideEx(!sideEx);
+  }
   
+  //Fetching the todos
+  const fetchTodos = async () => {
+       
+          try {
+          const res = await axios.get(
+            "http://localhost:3000/api/v1/dashboard/task/all",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          // console.log(res.data.tasks);
+          setTodos(res.data.tasks);
+        } catch (error) {
+          console.log("error: ", error);
+        }
+      };
+
+  //Submit todos
+  const onSubmit = async(data)=>{
+    try {
+      const res = await axios.post("http://localhost:3000/api/v1/dashboard/task/new",data, {
+      headers: {
+              Authorization: `Bearer ${token}`,
+            },
+    });
+    console.log(res.data)
+    fetchTodos();
+    } catch (error) {
+      console.log("Error: ", error)
+    }
+  }
+
+  useEffect(() => {
+    fetchTodos();
+  }, []);
 
 
-  
+
+
   return (
     <div className="min-h-screen flex bg-gray-950 text-gray-100">
       {/* Sidebar */}
-      <aside className="w-64 bg-black border-r border-gray-800 p-6 hidden md:flex flex-col gap-6 font-mono text-sm">
-        <h2 className="text-green-400 font-bold text-lg">$- /TERMINAL</h2>
-        <ul className="space-y-4">
-          <li className="hover:text-green-400 cursor-pointer doto-unique"><Link>$- /tasks</Link></li>
-          <li className="hover:text-green-400 cursor-pointer doto-unique"><Link>$- /reports</Link></li>
-          <li className="hover:text-green-400 cursor-pointer doto-unique"><Link>$- /team</Link></li>
-          <li className="hover:text-green-400 cursor-pointer doto-unique"><Link>$- /focus-mode</Link></li>
-        </ul>
-      </aside>
+      {sideEx ? <SideBar menu={<IoMdClose color='white' className='size-5' onClick={checkEx} />}/> : <MdMenu onClick={checkEx} className="size-7 mt-7 ml-3" color='white' />}
 
       {/* Main Content */}
       <main className="flex-1 p-8 space-y-8">
@@ -64,7 +104,7 @@ export default function Dashboard() {
         {/* Task Feed */}
         <div className='p-4 roboto-slab bg-gray-900 flex flex-col rounded-lg gap-3'>
           <h1>Task Feed</h1>
-        <TaskTile />
+        <TaskTile token={token} fetch={fetchTodos} todos={todos} />
         </div>
       </main>
 
@@ -88,7 +128,7 @@ export default function Dashboard() {
             Start
           </button>
         </div>
-      <AddTask  />
+      <AddTask onSubmit={onSubmit} />
       </aside>
     </div>
   );
